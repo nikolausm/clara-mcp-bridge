@@ -23,10 +23,10 @@ services:
     container_name: mcp_azure_devops
     command: sh -c "npm install -g @tiberriver256/mcp-server-azure-devops && mcp-server-azure-devops"
     environment:
-      AZURE_DEVOPS_ORG_URL: "https://dev.azure.com/reifencom"
+      AZURE_DEVOPS_ORG_URL: "${AZURE_DEVOPS_ORG_URL}"
       AZURE_DEVOPS_AUTH_METHOD: "pat"
       AZURE_DEVOPS_PAT: "${AZURE_DEVOPS_PAT}"
-      AZURE_DEVOPS_DEFAULT_PROJECT: "reifencom"
+      AZURE_DEVOPS_DEFAULT_PROJECT: "${AZURE_DEVOPS_DEFAULT_PROJECT}"
     restart: unless-stopped
     networks:
       - mcp-network

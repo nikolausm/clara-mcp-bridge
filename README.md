@@ -10,7 +10,7 @@ Dieses Projekt stellt MCP-Server als Docker Container bereit, die mit Clara AI u
 
 ### Docker-basierte Server
 - **Desktop Commander** - Dateisystem-Operationen und Code-Verwaltung
-- **Azure DevOps** - Integration mit Azure DevOps (reifencom)
+- **Azure DevOps** - Integration mit Azure DevOps
 - **GitHub** - Repository-Management und Collaboration
 - **Home Assistant** - Smart Home Steuerung
 
@@ -43,7 +43,9 @@ docker-compose -f docker-compose-simple.yml up -d
 
 ### Umgebungsvariablen
 Erstellen Sie eine `.env` Datei mit folgenden Variablen:
+- `AZURE_DEVOPS_ORG_URL` - Ihre Azure DevOps Organisation URL
 - `AZURE_DEVOPS_PAT` - Azure DevOps Personal Access Token
+- `AZURE_DEVOPS_DEFAULT_PROJECT` - Standard-Projekt in Azure DevOps
 - `GITHUB_TOKEN` - GitHub Personal Access Token
 - `HOME_ASSISTANT_TOKEN` - Home Assistant Long-Lived Access Token
 
