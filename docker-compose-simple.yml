@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Desktop Commander
+  desktop-commander:
+    image: node:18-alpine
+    container_name: mcp_desktop_commander
+    volumes:
+      - /Users/michaelnikolaus:/workspace
+      - ~/Documents:/documents
+      - ~/Desktop:/desktop
+      - ~/Downloads:/downloads
+    command: sh -c "npm install -g @wonderwhy-er/desktop-commander@latest && desktop-commander"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    ports:
+      - "3001:3000"
+
+  # Azure DevOps
+  azure-devops:
+    image: node:18-alpine
+    container_name: mcp_azure_devops
+    command: sh -c "npm install -g @tiberriver256/mcp-server-azure-devops && mcp-server-azure-devops"
+    environment:
+      AZURE_DEVOPS_ORG_URL: "https://dev.azure.com/reifencom"
+      AZURE_DEVOPS_AUTH_METHOD: "pat"
+      AZURE_DEVOPS_PAT: "${AZURE_DEVOPS_PAT}"
+      AZURE_DEVOPS_DEFAULT_PROJECT: "reifencom"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    ports:
+      - "3002:3000"
+
+  # GitHub
+  github:
+    image: node:18-alpine
+    container_name: mcp_github
+    command: sh -c "npm install -g @modelcontextprotocol/server-github && github-mcp-server"
+    environment:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    ports:
+      - "3003:3000"
+
+  # Home Assistant (bereits als Docker image verfügbar)
+  home-assistant:
+    image: voska/hass-mcp:latest
+    container_name: mcp_home_assistant
+    environment:
+      HA_URL: "http://homeassistant.local:8123"
+      HA_TOKEN: "${HOME_ASSISTANT_TOKEN}"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    ports:
+      - "3004:3000"
+
+networks:
+  mcp-network:
+    name: mcp_bridge_network
+    driver: bridge

@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # Desktop Commander - NPX Version
+  desktop-commander:
+    image: node:18-alpine
+    container_name: mcp_desktop_commander
+    volumes:
+      - /Users/michaelnikolaus:/workspace:ro
+      - ~/Documents:/documents:ro
+      - ~/Desktop:/desktop:ro
+      - ~/Downloads:/downloads:ro
+    command: npx @wonderwhy-er/desktop-commander@latest
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    stdin_open: true
+    tty: true
+
+  # Azure DevOps
+  azure-devops:
+    image: node:18-alpine
+    container_name: mcp_azure_devops
+    command: npx -y @tiberriver256/mcp-server-azure-devops
+    environment:
+      AZURE_DEVOPS_ORG_URL: "https://dev.azure.com/reifencom"
+      AZURE_DEVOPS_AUTH_METHOD: "pat"
+      AZURE_DEVOPS_PAT: "${AZURE_DEVOPS_PAT}"
+      AZURE_DEVOPS_DEFAULT_PROJECT: "reifencom"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    stdin_open: true
+    tty: true
+
+  # GitHub
+  github:
+    image: node:18-alpine
+    container_name: mcp_github
+    command: npx -y @modelcontextprotocol/server-github
+    environment:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    stdin_open: true
+    tty: true
+
+  # Home Assistant
+  home-assistant:
+    image: voska/hass-mcp:latest
+    container_name: mcp_home_assistant
+    environment:
+      HA_URL: "http://homeassistant.local:8123"
+      HA_TOKEN: "${HOME_ASSISTANT_TOKEN}"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    stdin_open: true
+    tty: true
+
+  # Bondora - Custom build
+  bondora:
+    build:
+      context: ./bondora
+      dockerfile: Dockerfile
+    container_name: mcp_bondora
+    environment:
+      BONDORA_CLIENT_ID: "${BONDORA_CLIENT_ID}"
+      BONDORA_CLIENT_SECRET: "${BONDORA_CLIENT_SECRET}"
+      BONDORA_ACCESS_TOKEN: "${BONDORA_ACCESS_TOKEN}"
+      BONDORA_REFRESH_TOKEN: "${BONDORA_REFRESH_TOKEN}"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    stdin_open: true
+    tty: true
+
+  # Home Connect - Custom build
+  home-connect:
+    build:
+      context: ./home-connect
+      dockerfile: Dockerfile
+    container_name: mcp_home_connect
+    environment:
+      HOME_CONNECT_CLIENT_ID: "${HOME_CONNECT_CLIENT_ID}"
+      HOME_CONNECT_CLIENT_SECRET: "${HOME_CONNECT_CLIENT_SECRET}"
+      HOME_CONNECT_ACCESS_TOKEN: "${HOME_CONNECT_ACCESS_TOKEN}"
+      HOME_CONNECT_REFRESH_TOKEN: "${HOME_CONNECT_REFRESH_TOKEN}"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    stdin_open: true
+    tty: true
+
+  # Knowledge Server - Custom build
+  knowledge:
+    build:
+      context: ./knowledge
+      dockerfile: Dockerfile
+    container_name: mcp_knowledge
+    volumes:
+      - ./data/knowledge:/data
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    stdin_open: true
+    tty: true
+
+  # Email Server - Python based
+  email:
+    image: python:3.13-slim
+    container_name: mcp_email
+    command: pip install mcp-email-server && mcp-email-server stdio
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    stdin_open: true
+    tty: true
+
+networks:
+  mcp-network:
+    name: mcp_bridge_network
+    driver: bridge
+
+volumes:
+  knowledge_data:
